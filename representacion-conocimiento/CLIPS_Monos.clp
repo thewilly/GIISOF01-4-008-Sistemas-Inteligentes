@@ -3,6 +3,7 @@
 (deftemplate puerta
 	(slot origen)
 	(slot destino)
+	(slot cruzar (allowed-symbols triste contento))
 )
 
 (deftemplate objeto
@@ -16,7 +17,6 @@
 	(slot sala)
 	(slot encima-de)
 	(slot sostiene)
-	(slot hambre (allowed-symbols si no))
 )
 
 (deffacts base-hechos
@@ -30,20 +30,23 @@
 	(objeto (nombre banana) (sala sala4) (lugar fondo) (altura techo))
 )
 
-;(defrule puerta-simetrica
-;	(declare (salience 50))
-;	(puerta (origen ?o) (destino ?d))
-;	=>
-;	(assert (puerta (destino ?o) (origen ?d)))
-;)
+(defrule puerta-simetrica
+	(declare (salience 50))
+	(puerta (origen ?o) (destino ?d))
+	=>
+	(assert (puerta (destino ?o) (origen ?d)))
+)
 
 
 (defrule mover-mono
+	(logical (mono (sostiene banana) (encima-de suelo))) ; Completar hecho nuevo
 	?lm <- (mono (sala ?origen) (encima-de suelo) (sostiene nada) (hambre si))
 	(puerta (origen ?origen) (destino ?destino))
+	(not (visitado ?origen))
 	=> 
 	(assert (mono (sala ?destino) (encima-de suelo) (sostiene nada) (hambre si)))
    	(retract ?lm)
+   	(assert (visitado ?origen))
    	(printout t "mover de "?origen" a "?destino crlf)
 )
 
@@ -85,10 +88,10 @@
    	(printout t "coge la banana" crlf)
 )
 
-(defrule comer-banana-mesa
-	?lm <- (mono (sala ?sala) (encima-de ?superficie) (sostiene banana) (hambre si))
+(defrule comer-banana
+	?lm <- (mono (sala origen) (encima-de ?superficie) (sostiene banana) (hambre si))
 => 
-	(assert (mono (sala ?sala) (encima-de ?superficie) (sostiene nada) (hambre no)))
+	(assert (mono (sala origen) (encima-de ?superficie) (sostiene nada) (hambre no)))
    (retract ?lm)
    (printout t "come la banana" crlf)
 )
