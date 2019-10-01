@@ -7,20 +7,26 @@ import aima.core.util.datastructure.XYLocation;
  * @author Ravi Mohan
  * 
  */
-public class ManhattanHeuristicFunction implements HeuristicFunction {
+public class NewManhattanHeuristicFunction implements HeuristicFunction {
 	
 	private EightPuzzleGoalTest goal;
 	private double multiplicationFactor = 1.0; // For security init allways at 1.0, this value does not modify the product at h.
+	private double correctionFactor = 0.0; // Init always to 0, does not affect substraction.
 	
-	public ManhattanHeuristicFunction(EightPuzzleGoalTest goal) {
-		this(goal, 1.0);
+	public NewManhattanHeuristicFunction(EightPuzzleGoalTest goal) {
+		this(goal, 1.0, 0.0);
 	}
 
-	public ManhattanHeuristicFunction(EightPuzzleGoalTest goalState, double multiplicationFactor) {
-		this.goal = goalState;
-		this.multiplicationFactor = multiplicationFactor;
+	public NewManhattanHeuristicFunction(EightPuzzleGoalTest goalState, double multiplicationFactor) {
+		this(goalState, multiplicationFactor, 0.0);
 	}
 	
+	public NewManhattanHeuristicFunction(EightPuzzleGoalTest goalState, double multiplicationFactor, double correctionFactor) {
+		this.goal = goalState;
+		this.multiplicationFactor = multiplicationFactor;
+		this.correctionFactor = correctionFactor;
+	}
+
 	public double h(Object state) {
 		EightPuzzleBoard board = (EightPuzzleBoard) state;
 		int retVal = 0;
@@ -29,7 +35,7 @@ public class ManhattanHeuristicFunction implements HeuristicFunction {
 			XYLocation locGS = goal.getLocationOf(i);
 			retVal += evaluateManhattanDistanceOf(loc, locGS);
 		}
-		return (retVal * multiplicationFactor);
+		return (retVal * multiplicationFactor) + correctionFactor;
 
 	}
 	
